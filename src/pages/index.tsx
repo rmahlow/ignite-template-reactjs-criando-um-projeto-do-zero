@@ -59,7 +59,11 @@ export default function Home({ postsPagination }: HomeProps) {
                 <strong>{post.data.title}</strong>
                 <p>{post.data.subtitle}</p>
                 <div className={styles.author}>
-                  <time><FiCalendar /> {post.first_publication_date}</time>
+                  <time><FiCalendar />
+                    {format(new Date(post.first_publication_date), 'd MMM yyyy', {
+                      locale: ptBR,
+                    })}
+                  </time>
                   <p><FiUser /> {post.data.author}</p>
                 </div>
               </a>
@@ -96,7 +100,8 @@ export const getStaticProps: GetStaticProps = async () => {
         next_page: response.next_page,
         results: posts
       }
-    }
+    },
+    revalidate: 60 * 30,
   }
 };
 
@@ -104,9 +109,7 @@ const bindPosts = async (response: ApiSearchResponse) => {
   return response.results.map(post => {
     return {
       uid: post.uid,
-      first_publication_date: format(new Date(post.first_publication_date),"dd MMM yyyy",{
-        locale:ptBR
-      }),
+      first_publication_date: post.first_publication_date,
       // first_publication_date: new Date(post.first_publication_date).toLocaleDateString('pt-br', {
       //   day: '2-digit',
       //   month: 'long',
